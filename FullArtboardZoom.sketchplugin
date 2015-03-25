@@ -1,0 +1,25 @@
+//Zoom to current Artboard (command 5)
+var targetArtboard;
+
+if (selection.count() > 0) {
+    targetArtboard = selection[0];
+} else {
+    targetArtboard = doc.currentPage().artboards()[0];
+}
+
+while (targetArtboard.parentGroup() != doc.currentPage()) {
+    targetArtboard = targetArtboard.parentGroup();
+}
+
+doc.currentView().zoomToFitRect_(targetArtboard.absoluteRect());
+
+var width = 0.0;
+var artRect = targetArtboard.absoluteRect();
+var targetRect = GKRect.alloc().init();
+targetRect.x = artRect.x();
+targetRect.y = artRect.y();
+targetRect.width = artRect.width();
+
+targetRect.expandBy(width);
+
+doc.currentView().zoomToFitRect_(targetRect);
