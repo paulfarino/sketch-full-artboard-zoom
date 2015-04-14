@@ -1,6 +1,6 @@
 # sketch-plugins
 #### Full Screen Artboard Zoom
-
+- Makes artboard full screen based on width
 - Inpspired by @Arkkimaagi's ArtboardZoom & @tankery
 
 ### How to install
