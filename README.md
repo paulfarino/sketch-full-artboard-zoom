@@ -1,5 +1,5 @@
 # Sketch Full Artboard Zoom
-Makes your artboard full screen based on width. Great for presenting work on a Thunderbolt screen.
+Makes your Sketch artboard full screen based on width. Great for presenting work on a Thunderbolt screen.
 
 
 
