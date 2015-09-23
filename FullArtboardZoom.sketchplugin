@@ -1,25 +1,69 @@
-//Zoom to current Artboard (command 5)
-var targetArtboard;
+// sketch-full-artboard-zoom (shift command 5)
 
-if (selection.count() > 0) {
-    targetArtboard = selection[0];
+var page = [doc currentPage];
+var artboards = [page artboards];
+var view = [doc currentView];
+var scrollOrigin = [doc scrollOrigin];
+var zoomValue = [doc zoomValue];
+var viewportFrame = [view frame];
+var viewportWidth = viewportFrame.size.width;
+var viewportHeight = viewportFrame.size.height;
+
+function getInViewArtboardIndex() {
+  viewportCenterX = (viewportWidth / 2 - scrollOrigin.x) / zoomValue;
+  viewportCenterY = (viewportHeight / 2 - scrollOrigin.y) / zoomValue;
+  
+  var inViewArtboardIndex = 0;  
+  var minDistance = 1000000;  
+  for(var i = 0; i < [artboards count]; i++) {
+    artboard = [artboards objectAtIndex: i];
+    artboardRect = [artboard absoluteRect];
+
+    if ([artboardRect x] < viewportCenterX && [artboardRect x] + [artboardRect width] > viewportCenterX && [artboardRect y] < viewportCenterY && [artboardRect y] + [artboardRect height] > viewportCenterY) {
+        inViewArtboardIndex = i;
+        break;
+    } else {
+     
+      distance = Math.abs(viewportCenterX - ([artboardRect x] + [artboardRect width] / 2)) + Math.abs(viewportCenterY - ([artboardRect y] + [artboardRect height] / 2));
+     
+      if (distance < minDistance) {
+        inViewArtboardIndex = i;
+        minDistance = distance;
+      }
+    }
+  }
+
+  return inViewArtboardIndex;
+}
+
+var currentArtboardIndex = getInViewArtboardIndex()
+var currentArtboard = [artboards objectAtIndex: currentArtboardIndex];
+var currentArtboardRect = [currentArtboard absoluteRect];
+var nextArtboardIndex = (currentArtboardIndex + 1) % [artboards count];
+var nextArtboard;
+
+if (currentArtboard == [page currentArtboard] || [page currentArtboard] == null) {
+
+  nextArtboard = [artboards objectAtIndex: nextArtboardIndex];
 } else {
-    targetArtboard = doc.currentPage().artboards()[0];
+
+  nextArtboard = [page currentArtboard];  
 }
 
-while (targetArtboard.parentGroup() != doc.currentPage()) {
-    targetArtboard = targetArtboard.parentGroup();
+var nextArtboardRect = [nextArtboard absoluteRect];
+
+[[doc currentPage] deselectAllLayers]
+[nextArtboard select:true byExpandingSelection:true]
+
+var newX = [nextArtboardRect x];
+var newWidth = [nextArtboardRect width];
+var newZoomValue = viewportWidth / newWidth;
+var newY = Math.max([nextArtboardRect y], [nextArtboardRect y] - ([currentArtboardRect y] + scrollOrigin.y / zoomValue));
+if (newY > [nextArtboardRect y] + [nextArtboardRect height]) {
+
+  newY = [nextArtboardRect y] + [nextArtboardRect height] - viewportHeight;
 }
+var newHeight = viewportHeight / newZoomValue;
+var newRect = NSMakeRect(newX, newY, newWidth, newHeight);
 
-doc.currentView().zoomToFitRect_(targetArtboard.absoluteRect());
-
-var width = 0.0;
-var artRect = targetArtboard.absoluteRect();
-var targetRect = GKRect.alloc().init();
-targetRect.x = artRect.x();
-targetRect.y = artRect.y();
-targetRect.width = artRect.width();
-
-targetRect.expandBy(width);
-
-doc.currentView().zoomToFitRect_(targetRect);
+view.zoomToFitRect(newRect);
