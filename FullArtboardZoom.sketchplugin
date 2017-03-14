@@ -12,9 +12,9 @@ var viewportHeight = viewportFrame.size.height;
 function getInViewArtboardIndex() {
   viewportCenterX = (viewportWidth / 2 - scrollOrigin.x) / zoomValue;
   viewportCenterY = (viewportHeight / 2 - scrollOrigin.y) / zoomValue;
-  
-  var inViewArtboardIndex = 0;  
-  var minDistance = 1000000;  
+
+  var inViewArtboardIndex = 0;
+  var minDistance = 1000000;
   for(var i = 0; i < [artboards count]; i++) {
     artboard = [artboards objectAtIndex: i];
     artboardRect = [artboard absoluteRect];
@@ -23,9 +23,9 @@ function getInViewArtboardIndex() {
         inViewArtboardIndex = i;
         break;
     } else {
-     
+
       distance = Math.abs(viewportCenterX - ([artboardRect x] + [artboardRect width] / 2)) + Math.abs(viewportCenterY - ([artboardRect y] + [artboardRect height] / 2));
-     
+
       if (distance < minDistance) {
         inViewArtboardIndex = i;
         minDistance = distance;
@@ -39,29 +39,29 @@ function getInViewArtboardIndex() {
 var currentArtboardIndex = getInViewArtboardIndex()
 var currentArtboard = [artboards objectAtIndex: currentArtboardIndex];
 var currentArtboardRect = [currentArtboard absoluteRect];
-var nextArtboardIndex = (currentArtboardIndex + 1) % [artboards count];
-var nextArtboard;
+var currentArtboardIndex = (currentArtboardIndex) % [artboards count];
+var currentArtboard;
 
 if (currentArtboard == [page currentArtboard] || [page currentArtboard] == null) {
 
-  nextArtboard = [artboards objectAtIndex: nextArtboardIndex];
+  currentArtboard = [artboards objectAtIndex: currentArtboardIndex];
 } else {
 
-  nextArtboard = [page currentArtboard];  
+  currentArtboard = [page currentArtboard];
 }
 
-var nextArtboardRect = [nextArtboard absoluteRect];
+var currentArtboardRect = [currentArtboard absoluteRect];
 
 [[doc currentPage] deselectAllLayers]
-[nextArtboard select:true byExpandingSelection:true]
+[currentArtboard select:true byExpandingSelection:true]
 
-var newX = [nextArtboardRect x];
-var newWidth = [nextArtboardRect width];
+var newX = [currentArtboardRect x];
+var newWidth = [currentArtboardRect width];
 var newZoomValue = viewportWidth / newWidth;
-var newY = Math.max([nextArtboardRect y], [nextArtboardRect y] - ([currentArtboardRect y] + scrollOrigin.y / zoomValue));
-if (newY > [nextArtboardRect y] + [nextArtboardRect height]) {
+var newY = Math.max([currentArtboardRect y], [currentArtboardRect y] - ([currentArtboardRect y] + scrollOrigin.y / zoomValue));
+if (newY > [currentArtboardRect y] + [currentArtboardRect height]) {
 
-  newY = [nextArtboardRect y] + [nextArtboardRect height] - viewportHeight;
+  newY = [currentArtboardRect y] + [currentArtboardRect height] - viewportHeight;
 }
 var newHeight = viewportHeight / newZoomValue;
 var newRect = NSMakeRect(newX, newY, newWidth, newHeight);
